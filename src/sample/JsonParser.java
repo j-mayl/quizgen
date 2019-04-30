@@ -1,3 +1,5 @@
+package sample;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -6,6 +8,7 @@ import java.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import sample.Question;
 
 public class JsonParser {
     ArrayList<Question> QuestionList = new ArrayList<>();
@@ -47,8 +50,9 @@ public class JsonParser {
                     Question question =
                         new Question(metadata, questionText, topic, imageName,
                             correctAnswer,choices);
-                    QuestionList.add(question);
-                    //TODO Quiz.addQuestion();
+                    QuestionList.add(question); //For testing purposes
+                    Quiz quiz = new Quiz();
+                    quiz.addQuestion(question);
 
 
 
