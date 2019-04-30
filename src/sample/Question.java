@@ -1,3 +1,5 @@
+package application;
+
 import java.util.ArrayList;
 
 public class Question{
@@ -15,6 +17,7 @@ public class Question{
         this.topic = topic;
         this.imageName = imageName;
         this.correctAnswer = correctAnswer;
+        otherAnswers = new ArrayList<String>();
     }
     public void addAnswerChoice(String answerChoice){
         otherAnswers.add(answerChoice);

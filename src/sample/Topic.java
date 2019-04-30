@@ -1,16 +1,21 @@
+package application;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Topic {
-    private String topicName;
+    private String name;
     private ArrayList<Question> questions;
 
     public Topic(String topic) {
-        topicName = topic;
+        name = topic;
         questions = new ArrayList<Question>();
     }
 
-    private void addQuestion(Question question) {
+    public String getName() {
+      return name;
+    }
+    public void addQuestion(Question question) {
         questions.add(question);
     }
     private ArrayList<Question> getQuestions(int numQuestions) {
