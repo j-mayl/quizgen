@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
- static Quiz quiz;
+  static Quiz quiz;
 
   @Override
   public void start(Stage primaryStage) throws Exception {
@@ -159,6 +159,40 @@ public class Main extends Application {
     hbsq3.getChildren().addAll(backToMain2, startGame);
     hbsq3.setAlignment(Pos.CENTER);
 
+    // ------------------------------------------------------------------------- Question Screen -----------------
+    Label questionNum = new Label("Question Number: " + 1);
+    questionNum.setFont(Font.font("Denmark",30));
+    Label currentTopic = new Label("Topic: " + "Topic here");
+    currentTopic.setFont(Font.font("Denmark",15));
+    Label questionLabel = new Label("Question: " + "What is the BEST CS class?");
+    questionLabel.setFont(Font.font("Denmark",15));
+
+    Label answerList = new Label("Answers: ");
+    answerList.setFont(Font.font("Denmark",15));
+
+    ObservableList<String> answers =
+        FXCollections.observableArrayList(
+            "Answer 1",
+            "Answer 2",
+            "Answer 3",
+            "Answer 4",
+            "Answer 5"
+        );
+
+    ComboBox answersBox = new ComboBox(answers);
+
+    Button nextQuestion = new Button("Next");
+    nextQuestion.setFont(Font.font("Denmark",15));
+
+    Image image = new Image("https://static.thisisinsider.com/image/5c59e77ceb3ce80d46564023.jpg");
+    ImageView viewImage = new ImageView(image);
+    viewImage.setPreserveRatio(true);
+    viewImage.setFitHeight(150);
+
+    HBox answerSelect = new HBox(10);
+    answerSelect.getChildren().addAll(answerList, answersBox);
+    answerSelect.setAlignment(Pos.CENTER);
+
     // ------------------------------------------------------------------------- SCENES
     // ---------------------------
     // main screen is a vbox
@@ -183,6 +217,10 @@ public class Main extends Application {
     VBox startScreen = new VBox(10, startQuiz, hbsq2, hbsq1, hbsq3);
     startScreen.setAlignment(Pos.TOP_CENTER);
 
+    // current question is a vbox of hboxe
+    VBox currQuestion = new VBox(10, questionNum, viewImage, questionLabel, currentTopic, answerSelect, nextQuestion);
+    currQuestion.setAlignment(Pos.TOP_CENTER);
+
     // ----------------------------------------------------------------------------- CREATING SCENES
     // --------------
     // Creating a scene object
@@ -190,6 +228,7 @@ public class Main extends Application {
     Scene addQuestionPage = new Scene(addQuestionVbox, 450, 400);
     Scene quitPage = new Scene(quitScreen, 300, 190);
     Scene startPage = new Scene(startScreen, 375, 175);
+    Scene quizPage = new Scene(currQuestion, 450, 340);
 
     // ----------------------------------------------------------------------------- STAGE STUFF
     // ------------------
@@ -209,6 +248,8 @@ public class Main extends Application {
     quit.setOnAction(event -> primaryStage.close());
     startButton.setOnAction(event -> primaryStage.setScene(startPage));
     backToMain2.setOnAction(event -> primaryStage.setScene(mainPage));
+    startGame.setOnAction(event -> primaryStage.setScene(quizPage));
+
 
     addQuestion.setOnAction(event -> {
       boolean success = true;
@@ -225,17 +266,16 @@ public class Main extends Application {
       if (success) {
         Question question = new Question("", newQuestion.getText(), newTopic.getText(),
             imagePath.getText(), a1.getText());
-        question.addAnswerChoice(a2.getText());
-        question.addAnswerChoice(a3.getText());
-        question.addAnswerChoice(a4.getText());
-        question.addAnswerChoice(a5.getText());
-        quiz.addQuestion(question);
+//        question.addAnswerChoice(a2.getText());
+//        question.addAnswerChoice(a3.getText());
+//        question.addAnswerChoice(a4.getText());
+//        question.addAnswerChoice(a5.getText());
+//        quiz.addQuestion(question);
       }
-      
+
       totalNumberOfQuestions.setText("Number of questions loaded: " + quiz.questionNum);
       totalNumberOfTopics.setText("Number of different topics: " + quiz.topicList.size());
     });
-
 
   }
 
