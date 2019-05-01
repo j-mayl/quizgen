@@ -298,7 +298,6 @@ public class Main extends Application {
             try {
                 JsonParser jsonParser = new JsonParser();
                 String filename = fileNameHere.getText();
-                System.out.println(filename);
                 jsonParser.getQuestions(filename, quiz);
                 primaryStage.setScene(mainPage);
             } catch (ParseException e1) {
@@ -473,7 +472,7 @@ public class Main extends Application {
     private void transitionToEndScreen(Label finalCorrect, Label finalWrong, Label percentage) {
         finalCorrect.setText("Correct: " + quiz.getCorrect());
         finalWrong.setText("Incorrect: " + quiz.getIncorrect());
-        percentage.setText("Percentage: " + quiz.getPercentage() + "%");
+        percentage.setText("Percentage: " + Math.round(quiz.getPercentage()) + "%");
         quiz.setCorrect(0);
         quiz.setIncorrect(0);
     }
