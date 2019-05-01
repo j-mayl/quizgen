@@ -1,5 +1,9 @@
-package sample;
+package application;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.json.simple.parser.ParseException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -141,14 +145,14 @@ public class Main extends Application {
     desiredNumQuestions.setFont(Font.font("Denmark", 15));
     Button backToMain2 = new Button("Back");
     backToMain2.setFont(Font.font("Denmark", 15));
-    Button startGame = new Button("Start");
-    startGame.setFont(Font.font("Denmark", 15));
+    Button startQuizBtn = new Button("Start");
+    startQuizBtn.setFont(Font.font("Denmark", 15));
     TextField numQuestions = new TextField();
     numQuestions.setFont(Font.font("Denmark", 15));
 
     ObservableList<String> options =
         FXCollections.observableArrayList("Math", "Science", "Smash Ultimate");
-    ComboBox topicBox = new ComboBox(options);
+    ComboBox<String> topicBox = new ComboBox<String>(options);
     HBox hbsq1 = new HBox(10);
     HBox hbsq2 = new HBox(10);
     HBox hbsq3 = new HBox(10);
@@ -156,33 +160,28 @@ public class Main extends Application {
     hbsq1.setAlignment(Pos.CENTER);
     hbsq2.getChildren().addAll(desiredNumQuestions, numQuestions);
     hbsq2.setAlignment(Pos.CENTER);
-    hbsq3.getChildren().addAll(backToMain2, startGame);
+    hbsq3.getChildren().addAll(backToMain2, startQuizBtn);
     hbsq3.setAlignment(Pos.CENTER);
 
-    // ------------------------------------------------------------------------- Question Screen -----------------
+    // ------------------------------------------------------------------------- Question Screen
+    // -----------------
     Label questionNum = new Label("Question Number: " + 1);
-    questionNum.setFont(Font.font("Denmark",30));
+    questionNum.setFont(Font.font("Denmark", 30));
     Label currentTopic = new Label("Topic: " + "Topic here");
-    currentTopic.setFont(Font.font("Denmark",15));
+    currentTopic.setFont(Font.font("Denmark", 15));
     Label questionLabel = new Label("Question: " + "What is the BEST CS class?");
-    questionLabel.setFont(Font.font("Denmark",15));
+    questionLabel.setFont(Font.font("Denmark", 15));
 
     Label answerList = new Label("Answers: ");
-    answerList.setFont(Font.font("Denmark",15));
+    answerList.setFont(Font.font("Denmark", 15));
 
-    ObservableList<String> answers =
-        FXCollections.observableArrayList(
-            "Answer 1",
-            "Answer 2",
-            "Answer 3",
-            "Answer 4",
-            "Answer 5"
-        );
+    ObservableList<String> answers = FXCollections.observableArrayList("Answer 1", "Answer 2",
+        "Answer 3", "Answer 4", "Answer 5");
 
-    ComboBox answersBox = new ComboBox(answers);
+    ComboBox<String> answersBox = new ComboBox<String>(answers);
 
     Button nextQuestion = new Button("Next");
-    nextQuestion.setFont(Font.font("Denmark",15));
+    nextQuestion.setFont(Font.font("Denmark", 15));
 
     Image image = new Image("https://static.thisisinsider.com/image/5c59e77ceb3ce80d46564023.jpg");
     ImageView viewImage = new ImageView(image);
@@ -217,8 +216,9 @@ public class Main extends Application {
     VBox startScreen = new VBox(10, startQuiz, hbsq2, hbsq1, hbsq3);
     startScreen.setAlignment(Pos.TOP_CENTER);
 
-    // current question is a vbox of hboxe
-    VBox currQuestion = new VBox(10, questionNum, viewImage, questionLabel, currentTopic, answerSelect, nextQuestion);
+    // current question is a vbox of hbox
+    VBox currQuestion = new VBox(10, questionNum, viewImage, questionLabel, currentTopic,
+        answerSelect, nextQuestion);
     currQuestion.setAlignment(Pos.TOP_CENTER);
 
     // ----------------------------------------------------------------------------- CREATING SCENES
@@ -239,16 +239,85 @@ public class Main extends Application {
     // ------------------------------------------------------------------------------ BUTTON ACTIONS
     // --------------
     // main screen actions
-    newQuestionButton.setOnAction(event -> primaryStage.setScene(addQuestionPage));
+    newQuestionButton.setOnAction(event -> {
+      totalNumberOfQuestions.setText("Number of questions loaded: " + quiz.questionNum);
+      totalNumberOfTopics.setText("Number of different topics: " + quiz.topicList.size());
+      primaryStage.setScene(addQuestionPage);
+    });
+
+    importButton.setOnAction(event -> {
+      JsonParser parser = new JsonParser();
+      try {
+        parser.getQuestions("application/json_questions/questions_003.json", quiz);
+      } catch (FileNotFoundException e) {
+        System.out.println("File not found");
+        e.printStackTrace();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (ParseException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    });
+
+    // start quiz actions
+    startButton.setOnAction(event -> {
+      ObservableList<String> tempOptions = FXCollections.observableArrayList(quiz.topicNames);
+      topicBox.setItems(tempOptions);;
+      primaryStage.setScene(startPage);
+    });
+
+    startQuizBtn.setOnAction(event -> {
+      boolean success = true;
+      int number = 0;
+
+      try {
+        number = Integer.parseInt(numQuestions.getText());
+        if (number < 1) {
+          numQuestions.setText("");
+          numQuestions.setPromptText("Enter a number > 1");
+          success = false;
+        }
+      } catch (NumberFormatException e) {
+        numQuestions.setText("");
+        numQuestions.setPromptText("Enter a valid response");
+        success = false;
+      }
+
+      String topic = topicBox.getValue();
+      if (topic == null || topic.equals("")) {
+        topicBox.setPromptText("Choose a valid response");
+        success = false;
+      }
+
+      if (success) {
+        quiz.getQuestions(topic, number);
+        transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage);
+        primaryStage.setScene(quizPage);
+      }
+    });
+
+    nextQuestion.setOnAction(event -> {
+      if (quiz.questionList.get(0).correctAnswer.equals(answersBox.getValue().toString())) {
+        quiz.questionList.remove(0);
+        if (quiz.questionList.size() == 0) {
+          primaryStage.setScene(mainPage);
+        } else {
+          transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage);
+        }
+      } else {
+        answersBox.setValue("Try Again");
+      }
+    });
 
     // add question actions
     back.setOnAction(event -> primaryStage.setScene(mainPage));
     backToMain.setOnAction(event -> primaryStage.setScene(mainPage));
     quitButton.setOnAction(event -> primaryStage.setScene(quitPage));
     quit.setOnAction(event -> primaryStage.close());
-    startButton.setOnAction(event -> primaryStage.setScene(startPage));
     backToMain2.setOnAction(event -> primaryStage.setScene(mainPage));
-    startGame.setOnAction(event -> primaryStage.setScene(quizPage));
+
 
 
     addQuestion.setOnAction(event -> {
@@ -264,27 +333,47 @@ public class Main extends Application {
       success = (checkTextField(imagePath)) ? success : false;
 
       if (success) {
+        ArrayList<String> allAnswers = new ArrayList<String>();
+        allAnswers.add(a1.getText());
+        allAnswers.add(a2.getText());
+        allAnswers.add(a3.getText());
+        allAnswers.add(a4.getText());
+        allAnswers.add(a5.getText());
+
         Question question = new Question("", newQuestion.getText(), newTopic.getText(),
-            imagePath.getText(), a1.getText());
-//        question.addAnswerChoice(a2.getText());
-//        question.addAnswerChoice(a3.getText());
-//        question.addAnswerChoice(a4.getText());
-//        question.addAnswerChoice(a5.getText());
-//        quiz.addQuestion(question);
+            imagePath.getText(), a1.getText(), allAnswers);
+        quiz.addQuestion(question);
       }
 
       totalNumberOfQuestions.setText("Number of questions loaded: " + quiz.questionNum);
       totalNumberOfTopics.setText("Number of different topics: " + quiz.topicList.size());
     });
-
   }
 
   private boolean checkTextField(TextField textField) {
     if (textField.getText() == null || textField.getText().equals("")) {
-      textField.setPromptText("Please enter a response");
+      textField.setPromptText("Enter a valid response");
       return false;
     }
     return true;
+  }
+
+  private void transitionToNextQuestion(Label topicLabel, Label questionLabel,
+      ComboBox<String> answersBox, ImageView viewImage) {
+    Question question = quiz.questionList.get(0);
+    topicLabel.setText("Current topic: " + question.topic);
+    questionLabel.setText("Question: " + question.questionText);
+
+    ObservableList<String> answers = FXCollections.observableArrayList(question.allAnswers);
+    answersBox.setItems(answers);
+    answersBox.setValue("");
+
+    try {
+      Image image = new Image(question.imageName);
+      viewImage.setImage(image);
+    } catch (IllegalArgumentException e) {
+      viewImage.setImage(null);
+    }
   }
 
   public static void main(String[] args) {

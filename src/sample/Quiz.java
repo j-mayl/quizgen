@@ -1,15 +1,17 @@
-package sample;
+package application;
 
 import java.util.ArrayList;
 
 public class Quiz {
 
   int questionNum;
+  ArrayList<Question> questionList;
   ArrayList<String> topicNames;
   ArrayList<Topic> topicList;
 
   Quiz() {
     questionNum = 0;
+    questionList = new ArrayList<Question>();
     topicNames = new ArrayList<String>();
     topicList = new ArrayList<Topic>();
   }
@@ -31,6 +33,20 @@ public class Quiz {
           break;
         }
       }
+    }
+  }
+
+  public void getQuestions(String topicName, int numQuestions) {
+    questionList = new ArrayList<Question>();
+    if (topicNames.contains(topicName)) {
+      for (Topic topic : topicList) {
+        if (topicName.equals(topic.getName())) {
+          questionList = topic.getQuestions(numQuestions);
+          //System.out.println();
+        }
+      }
+    } else {
+      questionList = new ArrayList<Question>();
     }
   }
 }
