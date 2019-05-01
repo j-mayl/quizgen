@@ -151,6 +151,7 @@ public class Main extends Application {
         ObservableList<String> options =
             FXCollections.observableArrayList("Math", "Science", "Smash Ultimate");
         ComboBox<String> topicBox = new ComboBox<String>(options);
+        topicBox.setPromptText("Chose Topic");
         HBox hbsq1 = new HBox(10);
         HBox hbsq2 = new HBox(10);
         HBox hbsq3 = new HBox(10);
@@ -188,8 +189,8 @@ public class Main extends Application {
         Image image =
             new Image("https://static.thisisinsider.com/image/5c59e77ceb3ce80d46564023.jpg");
         ImageView viewImage = new ImageView(image);
-        viewImage.setPreserveRatio(true);
-        viewImage.setFitHeight(150);
+        viewImage.setFitHeight(200);
+        viewImage.setFitWidth(200);
 
         HBox answerSelect = new HBox(10);
         answerSelect.getChildren().addAll(answerList, answersBox);
@@ -277,7 +278,7 @@ public class Main extends Application {
         Scene addQuestionPage = new Scene(addQuestionVbox, 450, 400);
         Scene quitPage = new Scene(quitScreen, 300, 170);
         Scene startPage = new Scene(startScreen, 375, 175);
-        Scene quizPage = new Scene(currQuestion, 450, 375);
+        Scene quizPage = new Scene(currQuestion, 450, 425);
         Scene importPage = new Scene(importScreen, 300, 120);
         Scene endPage = new Scene(finalScreen, 300, 175);
 
