@@ -1,5 +1,6 @@
 package sample;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -207,7 +208,23 @@ public class Main extends Application {
         importBox2.getChildren().addAll(backToMain3, submitImport);
         importBox2.setAlignment(Pos.CENTER);
 
+        // -------------------------------------------------------------- FINAL SCREEN ------------
+        Label quizOver = new Label("Quiz Complete!");
+        quizOver.setFont(Font.font("Denmark", 30));
+        Label finalCorrect = new Label("Correct: " + 0);
+        finalCorrect.setFont(Font.font("Denmark", 15));
+        Label finalWrong = new Label("Incorrect: " + 1);
+        finalWrong.setFont(Font.font("Denmark", 15));
+        Label percentage = new Label("Percentage: " + 0 + "%");
+        percentage.setFont(Font.font("Denmark", 15));
+        Button endQuiz = new Button("Try again");
+        endQuiz.setFont(Font.font("Denmark", 15));
+        Button quitQuiz = new Button("Quit");
+        quitQuiz.setFont(Font.font("Denmark", 15));
 
+        HBox finalBox1 = new HBox(10);
+        finalBox1.getChildren().addAll(endQuiz, quitQuiz);
+        finalBox1.setAlignment(Pos.CENTER);
 
         // ------------------------------------------------------------------------- SCENES
         // ---------------------------
@@ -227,7 +244,7 @@ public class Main extends Application {
         addQuestionVbox.setSpacing(10);
 
         // quit screen is a vbox
-        VBox quitScreen = new VBox(10, goodByeMessage, quit, saveAndQuit, backToMain);
+        VBox quitScreen = new VBox(10, goodByeMessage, backToMain, saveAndQuit, quit);
         quitScreen.setAlignment(Pos.TOP_CENTER);
 
         // start game screen is a vbox
@@ -244,15 +261,20 @@ public class Main extends Application {
         VBox importScreen = new VBox(10, importQuestions, importBox1, importBox2);
         importScreen.setAlignment(Pos.TOP_CENTER);
 
+        // final screen is a vbox
+        VBox finalScreen = new VBox(10, quizOver, finalCorrect, finalWrong, percentage, finalBox1);
+        finalScreen.setAlignment(Pos.TOP_CENTER);
+
         // ----------------------------------------------------------------------------- CREATING SCENES
         // --------------
         // Creating a scene object
-        Scene mainPage = new Scene(mainVbox, 300, 275);
+        Scene mainPage = new Scene(mainVbox, 300, 255);
         Scene addQuestionPage = new Scene(addQuestionVbox, 450, 400);
-        Scene quitPage = new Scene(quitScreen, 300, 190);
+        Scene quitPage = new Scene(quitScreen, 300, 170);
         Scene startPage = new Scene(startScreen, 375, 175);
         Scene quizPage = new Scene(currQuestion, 450, 340);
         Scene importPage = new Scene(importScreen, 300, 120);
+        Scene endPage = new Scene(finalScreen, 300, 175);
 
         // ----------------------------------------------------------------------------- STAGE STUFF
         // ------------------
@@ -265,6 +287,7 @@ public class Main extends Application {
         // main screen actions
         importButton.setOnAction(event -> primaryStage.setScene(importPage));
         backToMain3.setOnAction(event -> primaryStage.setScene(mainPage));
+
         submitImport.setOnAction(event -> {
             try {
                 JsonParser jsonParser = new JsonParser();
@@ -333,15 +356,19 @@ public class Main extends Application {
         nextQuestion.setOnAction(event -> {
             if (quiz.questionList.get(0).correctAnswer.equals(answersBox.getValue().toString())) {
                 quiz.questionList.remove(0);
-                if (quiz.questionList.size() == 0) {
-                    primaryStage.setScene(mainPage);
-                } else {
-                    transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage);
-                }
+                quiz.setCorrect(quiz.getCorrect() + 1);
             } else {
-                answersBox.setValue("Try Again");
+                quiz.questionList.remove(0);
+                quiz.setIncorrect(quiz.getIncorrect() + 1);
+            }
+            if (quiz.questionList.size() == 0) {
+                primaryStage.setScene(endPage);
+                transitionToEndScreen(finalCorrect, finalWrong, percentage);
+            } else {
+                transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage);
             }
         });
+
 
         // add question actions
         back.setOnAction(event -> primaryStage.setScene(mainPage));
@@ -349,11 +376,13 @@ public class Main extends Application {
         quitButton.setOnAction(event -> primaryStage.setScene(quitPage));
         quit.setOnAction(event -> primaryStage.close());
         backToMain2.setOnAction(event -> primaryStage.setScene(mainPage));
-
+        endQuiz.setOnAction(event -> primaryStage.setScene(mainPage));
+        quitQuiz.setOnAction(event -> primaryStage.setScene(quitPage));
 
 
         addQuestion.setOnAction(event -> {
             boolean success = true;
+            boolean imageCheck;
 
             success = (checkTextField(newQuestion)) ? success : false;
             success = (checkTextField(newTopic)) ? success : false;
@@ -362,7 +391,18 @@ public class Main extends Application {
             success = (checkTextField(a3)) ? success : false;
             success = (checkTextField(a4)) ? success : false;
             success = (checkTextField(a5)) ? success : false;
-            success = (checkTextField(imagePath)) ? success : false;
+            if (imagePath.getText() != null || imagePath.getText().equals("")) {
+                File test = new File("./src/" + imagePath.getText());
+                Boolean exist = test.exists();
+                if (!exist) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Incorrect image path");
+                    alert.setContentText("I can't believe you've done this");
+                    alert.showAndWait();
+                    success = false;
+                }
+            }
 
             if (success) {
                 ArrayList<String> allAnswers = new ArrayList<String>();
@@ -407,6 +447,14 @@ public class Main extends Application {
         } catch (IllegalArgumentException e) {
             viewImage.setImage(null);
         }
+    }
+
+    private void transitionToEndScreen(Label finalCorrect, Label finalWrong, Label percentage) {
+        finalCorrect.setText("Correct: " + quiz.getCorrect());
+        finalWrong.setText("Incorrect: " + quiz.getIncorrect());
+        percentage.setText("Percentage: " + quiz.getPercentage() + "%");
+        quiz.setCorrect(0);
+        quiz.setIncorrect(0);
     }
 
     public static void main(String[] args) {

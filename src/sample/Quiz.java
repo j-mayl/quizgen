@@ -8,6 +8,9 @@ public class Quiz {
     ArrayList<Question> questionList;
     ArrayList<String> topicNames;
     ArrayList<Topic> topicList;
+    private int correct = 0;
+    private int incorrect = 0;
+
 
     Quiz() {
         questionNum = 0;
@@ -48,5 +51,25 @@ public class Quiz {
         } else {
             questionList = new ArrayList<Question>();
         }
+    }
+
+    public int getCorrect() {
+        return correct;
+    }
+
+    public int getIncorrect() {
+        return incorrect;
+    }
+
+    public double getPercentage() {
+        return ((double)correct / (((double)incorrect + (double)correct)) * 100);
+    }
+
+    public void setCorrect(int correct) {
+        this.correct = correct;
+    }
+
+    public void setIncorrect(int incorrect) {
+        this.incorrect = incorrect;
     }
 }
