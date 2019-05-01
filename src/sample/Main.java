@@ -179,7 +179,11 @@ public class Main extends Application {
         ComboBox<String> answersBox = new ComboBox<String>(answers);
 
         Button nextQuestion = new Button("Next");
-        nextQuestion.setFont(Font.font("Denmark", 15));
+        nextQuestion.setFont(Font.font("Denmark", 20));
+        Button submitAnswer = new Button("Submit");
+        submitAnswer.setFont(Font.font("Denmark", 20));
+
+        Label answerResult = new Label("");
 
         Image image =
             new Image("https://static.thisisinsider.com/image/5c59e77ceb3ce80d46564023.jpg");
@@ -190,6 +194,7 @@ public class Main extends Application {
         HBox answerSelect = new HBox(10);
         answerSelect.getChildren().addAll(answerList, answersBox);
         answerSelect.setAlignment(Pos.CENTER);
+
 
         // --------------------------------------------------------------- IMPORT SCREEN ----------
         Label importQuestions = new Label("Import Questions");
@@ -254,7 +259,7 @@ public class Main extends Application {
         // current question is a vbox of hbox
         VBox currQuestion =
             new VBox(10, questionNum, viewImage, questionLabel, currentTopic, answerSelect,
-                nextQuestion);
+                submitAnswer, answerResult);
         currQuestion.setAlignment(Pos.TOP_CENTER);
 
         // import questions is a vbox of hbox
@@ -272,7 +277,7 @@ public class Main extends Application {
         Scene addQuestionPage = new Scene(addQuestionVbox, 450, 400);
         Scene quitPage = new Scene(quitScreen, 300, 170);
         Scene startPage = new Scene(startScreen, 375, 175);
-        Scene quizPage = new Scene(currQuestion, 450, 340);
+        Scene quizPage = new Scene(currQuestion, 450, 375);
         Scene importPage = new Scene(importScreen, 300, 120);
         Scene endPage = new Scene(finalScreen, 300, 175);
 
@@ -348,7 +353,7 @@ public class Main extends Application {
 
             if (success) {
                 quiz.getQuestions(topic, number);
-                transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage);
+                transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage, answerResult);
                 primaryStage.setScene(quizPage);
             }
         });
@@ -365,10 +370,24 @@ public class Main extends Application {
                 primaryStage.setScene(endPage);
                 transitionToEndScreen(finalCorrect, finalWrong, percentage);
             } else {
-                transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage);
+                transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage, answerResult);
             }
+
+            currQuestion.getChildren().removeAll(nextQuestion);
+            currQuestion.getChildren().addAll(submitAnswer);
         });
 
+        submitAnswer.setOnAction(event -> {
+            if (quiz.questionList.get(0).correctAnswer.equals(answersBox.getValue().toString())) {
+                answerResult.setTextFill(Paint.valueOf("Green"));
+                answerResult.setText("CORRECT");
+            } else {
+                answerResult.setTextFill(Paint.valueOf("Red"));
+                answerResult.setText("INCORRECT");
+            }
+            currQuestion.getChildren().removeAll(submitAnswer);
+            currQuestion.getChildren().addAll(nextQuestion);
+        });
 
         // add question actions
         back.setOnAction(event -> primaryStage.setScene(mainPage));
@@ -432,7 +451,7 @@ public class Main extends Application {
     }
 
     private void transitionToNextQuestion(Label topicLabel, Label questionLabel,
-        ComboBox<String> answersBox, ImageView viewImage) {
+        ComboBox<String> answersBox, ImageView viewImage, Label answerResult) {
         Question question = quiz.questionList.get(0);
         topicLabel.setText("Current topic: " + question.topic);
         questionLabel.setText("Question: " + question.questionText);
@@ -440,6 +459,7 @@ public class Main extends Application {
         ObservableList<String> answers = FXCollections.observableArrayList(question.allAnswers);
         answersBox.setItems(answers);
         answersBox.setValue("");
+        answerResult.setText("");
 
         try {
             Image image = new Image(question.imageName);
