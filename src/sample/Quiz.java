@@ -1,6 +1,7 @@
 package sample;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Quiz {
 
@@ -40,18 +41,39 @@ public class Quiz {
     }
 
     public void getQuestions(String topicName, int numQuestions) {
-        questionList = new ArrayList<Question>();
+        ArrayList<Question> temp = new ArrayList<Question>();
         if (topicNames.contains(topicName)) {
             for (Topic topic : topicList) {
                 if (topicName.equals(topic.getName())) {
-                    questionList = topic.getQuestions(numQuestions);
-                    //System.out.println();
+                    temp = topic.getQuestions(numQuestions);
+                    questionList.addAll(temp);
                 }
             }
         } else {
-            questionList = new ArrayList<Question>();
+
         }
     }
+    public void randomizeQuestionList() {
+        ArrayList<Question> duplicate = new ArrayList<Question>();
+        for (int i = 0; i < questionList.size(); i++) {
+            duplicate.add(questionList.get(i));
+        }
+        int remainingQuestions = questionList.size();
+
+        for (int i = 0; i < duplicate.size(); i++) {
+            questionList.remove(0);
+        }
+        Random rand = new Random();
+        // Get some questions
+        int length = duplicate.size();
+        for (int i = 0; i < length; i++) {
+            int index = rand.nextInt(remainingQuestions);
+            questionList.add(duplicate.get(index));
+            duplicate.remove(index);
+            remainingQuestions--;
+        }
+    }
+
 
     public int getCorrect() {
         return correct;
