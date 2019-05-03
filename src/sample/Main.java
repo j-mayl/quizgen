@@ -1,7 +1,7 @@
 package sample;
-
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -329,7 +329,14 @@ public class Main extends Application {
         backToMain4.setOnAction(event -> primaryStage.setScene(mainPage));
         saveAndQuit.setOnAction(event -> primaryStage.setScene(exportPage));
         submitExport.setOnAction(event -> {
-            JsonExport.exportToJson(exportFileNameField.getText(), quiz);
+            try {
+                String result = JsonExport.exportToJson(quiz);
+                FileWriter file = new FileWriter(exportFileNameField.getText().concat(".json"));
+                file.write(result);
+                file.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             primaryStage.setScene(mainPage);
         });
 
@@ -372,14 +379,14 @@ public class Main extends Application {
         });
 
         startQuizBtn.setOnAction(event -> {
-                if(quiz.questionNum != 0 && quiz.questionList.size() !=0) {
-                    quiz.randomizeQuestionList();
-                    transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage, answerResult, questionNum);
-                    primaryStage.setScene(quizPage);
-                } else {
-                    topicBox.setPromptText("Choose a valid response");
-                    numQuestions.setPromptText("Enter a valid response");
-                }
+            if(quiz.questionNum != 0 && quiz.questionList.size() !=0) {
+                quiz.randomizeQuestionList();
+                transitionToNextQuestion(currentTopic, questionLabel, answersBox, viewImage, answerResult, questionNum);
+                primaryStage.setScene(quizPage);
+            } else {
+                topicBox.setPromptText("Choose a valid response");
+                numQuestions.setPromptText("Enter a valid response");
+            }
         });
 
         addTopicQuestions.setOnAction(event -> {
@@ -498,6 +505,7 @@ public class Main extends Application {
                     new Question("", newQuestion.getText(), newTopic.getText(), imagePath.getText(),
                         a1.getText(), allAnswers);
                 quiz.addQuestion(question);
+                quiz.addToTotalQuestionList(question);
             }
 
             totalNumberOfQuestions.setText("Number of questions loaded: " + quiz.questionNum);

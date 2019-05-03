@@ -1,11 +1,11 @@
 package sample;
-
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Quiz {
 
     int questionNum;
+    ArrayList<Question> totalQuestionList;
     ArrayList<Question> questionList;
     ArrayList<String> topicNames;
     ArrayList<Topic> topicList;
@@ -15,11 +15,15 @@ public class Quiz {
 
     Quiz() {
         questionNum = 0;
+        totalQuestionList = new ArrayList<Question>();
         questionList = new ArrayList<Question>();
         topicNames = new ArrayList<String>();
         topicList = new ArrayList<Topic>();
     }
 
+    public void addToTotalQuestionList(Question question){
+        totalQuestionList.add(question);
+    }
     public void addQuestion(Question question) {
         if (question == null)
             return;
@@ -93,5 +97,9 @@ public class Quiz {
 
     public void setIncorrect(int incorrect) {
         this.incorrect = incorrect;
+    }
+
+    public ArrayList<Question> getTotalQuestionList() {
+        return totalQuestionList;
     }
 }

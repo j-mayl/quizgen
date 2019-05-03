@@ -32,6 +32,7 @@
 // Online Sources:  N/A
 //
 /////////////////////////////// 80 COLUMNS WIDE ///////////////////////////////
+package sample;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -110,6 +111,7 @@ public class JsonParser {
                     choices);
             QuestionList.add(question); // For testing purposes
             quiz.addQuestion(question);
+            quiz.addToTotalQuestionList(question);
         }
     }
 
