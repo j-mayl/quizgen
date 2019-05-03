@@ -17,7 +17,7 @@ public class JsonExport {
 
     }
 
-    public void exportToJson(String filename, Quiz quiz) {
+    public static void exportToJson(String filename, Quiz quiz) {
         ArrayList<Question> questionList = quiz.questionList;
         String isCorrect;
         JSONObject finalQuestionObject = new JSONObject();
@@ -66,7 +66,7 @@ public class JsonExport {
         }
 
         try {
-            FileWriter file = new FileWriter(filename);
+            FileWriter file = new FileWriter(filename + ".json");
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String prettyJson = gson.toJson(finalQuestionObject);
             file.write(prettyJson);
@@ -74,7 +74,6 @@ public class JsonExport {
         }catch(IOException e){
             e.printStackTrace();
         }
-
     }
 
 }

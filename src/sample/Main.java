@@ -28,9 +28,8 @@ public class Main extends Application {
     private int questionNumber = 1;
     @Override public void start(Stage primaryStage) throws Exception {
 
-        // ---------------------------------------------------------- MAIN SCREEN
-        // -------------------------------------
-        Label titleLabel = new Label("Quiz Generator");
+        // ---------------------------------------------------------- MAIN SCREEN ----------------------
+        Label titleLabel = new Label("Quiz Generator"); // all the nodes that go on the main screen scene
         titleLabel.setFont(Font.font("Denmark", 30));
         Button startButton = new Button("Start Quiz");
         startButton.setFont(Font.font("Denmark", 15));
@@ -43,9 +42,8 @@ public class Main extends Application {
         Button quitButton = new Button("Quit");
         quitButton.setFont(Font.font("Denmark", 15));
 
-        // --------------------------------------------------------- ADD QUESTION
-        // -------------------------------------
-        Label addQuestionTitle = new Label("Add Question");
+        // --------------------------------------------------------- ADD QUESTION -----------------------
+        Label addQuestionTitle = new Label("Add Question"); // all of the nodes that go on the add question scene
         addQuestionTitle.setFont(Font.font("Denmark", 30));
         Label questionPrompt = new Label("Enter Question: ");
         questionPrompt.setFont(Font.font("Denmark", 15));
@@ -88,7 +86,7 @@ public class Main extends Application {
         TextField a5 = new TextField();
         TextField imagePath = new TextField();
 
-        HBox hb2 = new HBox(10);
+        HBox hb2 = new HBox(10); // were using a vbox of hboxes for the components that are close to each other
         hb2.setAlignment(Pos.CENTER);
         hb2.getChildren().addAll(questionPrompt, newQuestion);
         HBox hb3 = new HBox(10);
@@ -119,9 +117,8 @@ public class Main extends Application {
         hb11.getChildren().addAll(totalNumberOfQuestions, totalNumberOfTopics);
         hb11.setAlignment(Pos.BASELINE_CENTER);
 
-        // ------------------------------------------------------------------------ QUIT SCREEN
-        // -----------------------
-        Label goodByeMessage = new Label("Thanks for playing :)");
+        // ------------------------------------------------------------------------ QUIT SCREEN -----------------
+        Label goodByeMessage = new Label("Thanks for playing :)"); // all of the nodes on the quit screen page
         goodByeMessage.setFont(Font.font("Denmark", 30));
         goodByeMessage.setAlignment(Pos.TOP_CENTER);
         Button quit = new Button("Quit");
@@ -134,9 +131,8 @@ public class Main extends Application {
         backToMain.setFont(Font.font("Denmark", 15));
         backToMain.setAlignment(Pos.CENTER);
 
-        // ------------------------------------------------------------------------ START QUIZ SCREEN
-        // -----------------
-        Label startQuiz = new Label("Start Quiz");
+        // ------------------------------------------------------------------------ START QUIZ SCREEN --------------
+        Label startQuiz = new Label("Start Quiz"); // all of the nodes on the start quiz screen
         startQuiz.setFont(Font.font("Denmark", 30));
         startQuiz.setAlignment(Pos.TOP_CENTER);
         Label topicLabel = new Label("Select Topic: ");
@@ -151,16 +147,14 @@ public class Main extends Application {
         startQuizBtn.setFont(Font.font("Denmark", 15));
         TextField numQuestions = new TextField();
         numQuestions.setFont(Font.font("Denmark", 15));
-        numQuestions.setPromptText("Number of questions");
+
 
         ObservableList<String> options =
             FXCollections.observableArrayList("Math", "Science", "Smash Ultimate");
         Comparator<String> stringComparator = Comparator.comparing(String::toString);
 
-        Label currentLoadedQuestions = new Label("Questions: 0");
+        Label currentLoadedQuestions = new Label("Number of questions: 0");
         currentLoadedQuestions.setFont(Font.font("Denmark", 15));
-        Label currentLoadedTopics = new Label("Topics: 0");
-        currentLoadedTopics.setFont(Font.font("Denmark", 15));
 
         ComboBox<String> topicBox = new ComboBox<String>(options);
         topicBox.setPromptText("Choose topic");
@@ -174,7 +168,7 @@ public class Main extends Application {
         hbsq2.setAlignment(Pos.CENTER);
         hbsq3.getChildren().addAll(backToMain2,addTopicQuestions, startQuizBtn);
         hbsq3.setAlignment(Pos.CENTER);
-        hbsq4.getChildren().addAll(currentLoadedQuestions, currentLoadedTopics);
+        hbsq4.getChildren().addAll(currentLoadedQuestions);
         hbsq4.setAlignment(Pos.CENTER);
 
         // ------------------------------------------------------------------------- Question Screen
@@ -259,15 +253,17 @@ public class Main extends Application {
         backToMain4.setFont(Font.font("Denmark", 15));
         Button submitExport = new Button("Submit");
         submitExport.setFont(Font.font("Denmark", 15));
+        Label jsonLabel = new Label(".json");
+        jsonLabel.setFont(Font.font("Denmark", 15));
+
         HBox eBox1 = new HBox(10);
-        eBox1.getChildren().addAll(exportFileName, exportFileNameField);
+        eBox1.getChildren().addAll(exportFileName, exportFileNameField, jsonLabel);
         eBox1.setAlignment(Pos.CENTER);
         HBox eBox2 = new HBox(10);
         eBox2.getChildren().addAll(backToMain4, submitExport);
         eBox2.setAlignment(Pos.CENTER);
 
-        // ------------------------------------------------------------------------- SCENES
-        // ---------------------------
+        // ------------------------------------------------------------------------- SCENES -----------------------
         // main screen is a vbox
         VBox mainVbox = new VBox();
         mainVbox.getChildren()
@@ -310,7 +306,6 @@ public class Main extends Application {
         finalScreen.setAlignment(Pos.TOP_CENTER);
 
         // ----------------------------------------------------------------------------- CREATING SCENES
-        // --------------
         // Creating a scene object
         Scene mainPage = new Scene(mainVbox, 300, 260);
         Scene addQuestionPage = new Scene(addQuestionVbox, 450, 400);
@@ -319,22 +314,24 @@ public class Main extends Application {
         Scene quizPage = new Scene(currQuestion, 450, 445);
         Scene importPage = new Scene(importScreen, 300, 130);
         Scene endPage = new Scene(finalScreen, 300, 185);
-        Scene exportPage = new Scene(exportScreen, 300, 130);
+        Scene exportPage = new Scene(exportScreen, 330, 130);
 
         // ----------------------------------------------------------------------------- STAGE STUFF
-        // ------------------
         primaryStage.setTitle("Quiz Generator");
         primaryStage.setScene(mainPage);
         primaryStage.show();
 
         // ------------------------------------------------------------------------------ BUTTON ACTIONS
-        // --------------
         // main screen actions
         importButton.setOnAction(event -> primaryStage.setScene(importPage));
         backToMain3.setOnAction(event -> primaryStage.setScene(mainPage));
         exportButton.setOnAction(event -> primaryStage.setScene(exportPage));
         backToMain4.setOnAction(event -> primaryStage.setScene(mainPage));
         saveAndQuit.setOnAction(event -> primaryStage.setScene(exportPage));
+        submitExport.setOnAction(event -> {
+            JsonExport.exportToJson(exportFileNameField.getText(), quiz);
+            primaryStage.setScene(mainPage);
+        });
 
         submitImport.setOnAction(event -> {
             try {
@@ -367,6 +364,9 @@ public class Main extends Application {
             ObservableList<String> tempOptions = FXCollections.observableArrayList(quiz.topicNames);
             FXCollections.sort(tempOptions, stringComparator);
             topicBox.setItems(tempOptions);
+            currentLoadedQuestions.setText("Number of questions: 0");
+            topicBox.setPromptText("Choose topic");
+            numQuestions.setPromptText("Number of questions");
             primaryStage.setScene(startPage);
             questionNumber = 1;
         });
@@ -410,13 +410,8 @@ public class Main extends Application {
 
             }
 
-            currentLoadedQuestions.setText("Questions: " + quiz.questionList.size());
-            currentLoadedTopics.setText("Topics: " + quiz.topicList.size());
+            currentLoadedQuestions.setText("Number of questions: " + quiz.questionList.size());
         });
-
-
-
-
 
         nextQuestion.setOnAction(event -> {
             questionNumber++;
@@ -458,7 +453,12 @@ public class Main extends Application {
         quitButton.setOnAction(event -> primaryStage.setScene(quitPage));
         quit.setOnAction(event -> primaryStage.close());
         backToMain2.setOnAction(event -> primaryStage.setScene(mainPage));
-        endQuiz.setOnAction(event -> primaryStage.setScene(mainPage));
+        endQuiz.setOnAction(event -> {
+            quiz.setCorrect(0);
+            quiz.setIncorrect(0);
+
+            primaryStage.setScene(mainPage);
+        });
         quitQuiz.setOnAction(event -> primaryStage.setScene(quitPage));
 
 
@@ -501,7 +501,7 @@ public class Main extends Application {
             }
 
             totalNumberOfQuestions.setText("Number of questions loaded: " + quiz.questionNum);
-            totalNumberOfTopics.setText("Number of different topics: " + quiz.topicList.size());
+            totalNumberOfTopics.setText("Number of different topics: " + quiz.topicNames.size());
         });
     }
 
@@ -536,8 +536,6 @@ public class Main extends Application {
         finalCorrect.setText("Correct: " + quiz.getCorrect());
         finalWrong.setText("Total Number: " + (quiz.getIncorrect() + quiz.getCorrect()));
         percentage.setText("Percentage: " + Math.round(quiz.getPercentage()) + "%");
-        quiz.setCorrect(0);
-        quiz.setIncorrect(0);
     }
 
     public static void main(String[] args) {
